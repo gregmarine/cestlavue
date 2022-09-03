@@ -1,5 +1,6 @@
 import { NuxtConfig } from '@nuxt/types';
-import fg from 'fast-glob';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const nuxtConfig: NuxtConfig =  {
   // Target: https://go.nuxtjs.dev/config-target
@@ -19,6 +20,17 @@ const nuxtConfig: NuxtConfig =  {
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [],
+
+  generate: {
+    routes: () => {
+      return fs.readdirSync('./content/blog').map(file => {
+        return {
+          route: `/blog/${path.parse(file).name}`,
+          payload: file
+        }
+      });
+    },
+  },
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [],
@@ -54,17 +66,6 @@ const nuxtConfig: NuxtConfig =  {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
-
-  generate: {
-    subFolders: false,
-
-    routes: [
-      ...fg.sync(['./app/content/blog/**.md']).map(url => ({
-        route: url.replace(/^.\/app\/content?|.md$/gi, ''),
-        payload: require(url),
-      })),
-    ],
-  },
 }
 
 export default nuxtConfig;
